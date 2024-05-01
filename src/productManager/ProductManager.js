@@ -1,6 +1,8 @@
-const fs = require('fs');
+import fs from "fs";
+import {v4 as uuidv4 } from 'uuid';
 
-class ProductManager {
+
+export default class ProductManager {
 
     
     products;
@@ -17,7 +19,7 @@ class ProductManager {
             }else{
                 if(this.isNotDuplicate(code)){
                     const newProduct = {
-                        id: this.idGenerator(),
+                        id: uuidv4(),
                         title: title,
                         descrption: description,
                         price: price,
@@ -27,6 +29,7 @@ class ProductManager {
                     }
                     this.products.push(newProduct);
                     await fs.promises.writeFile(this.path, JSON.stringify(this.products));
+                    return newProduct;
                 }else{
                     console.log("es un duplicado");
                 }
@@ -51,14 +54,13 @@ class ProductManager {
     }
 
 
-    idGenerator(){
-        return this.products.length + 1;
-    }
+    // idGenerator(){
+    //     return this.products.length + 1;
+    // }
 
     getProductById = async(productId) =>{
         const products = await this.getProducts();
         const product = products.find(product => product.id === productId);
-
         return product || "not found";
     }
 
@@ -73,16 +75,40 @@ class ProductManager {
     }
 
 
-    updateProduct = async(id, nombrePosicion, newValue) => {
-        const products = await this.getProducts();
-        const index = products.findIndex(p => p.id === id);
+    // updateProduct = async(id, nombrePosicion, newValue) => {
+    //     const products = await this.getProducts();
+    //     const index = products.findIndex(p => p.id === id);
 
             
-        const product = products[index];
-        product[nombrePosicion] = newValue;
+    //     const product = products[index];
+    //     product[nombrePosicion] = newValue;
+
+    //     await fs.promises.writeFile(this.path, JSON.stringify(products));
+
+    // }
+
+    updateProduct = async(id, nombrePosicion, newValue) => {
+        const products = await this.getProducts();
+        const index = products.findIndex(product => product.id === id);
+        
+        products[index][nombrePosicion] = newValue;
 
         await fs.promises.writeFile(this.path, JSON.stringify(products));
 
+    }
+
+    async updateProducts (obj,id){
+        try {
+            const products = await this.getProducts();
+            const product = this.getProductById(id);
+            if(!product) return "Product not found"
+            product = {...product, ...obj};
+            await fs.promises.writeFile(this.path, JSON.stringify(products));
+            return product;
+        } catch (error) {
+            console.log(error);
+        }
+        
     }
 
     async deleteProduct(id){
@@ -92,19 +118,6 @@ class ProductManager {
     }
 }
 
-const productos = new ProductManager("./productos.json");
+//  
 
-
-const test = async () => {
-    console.log(await productos.getProducts());
-    await productos.addProduct("producto prueba","Este es un producto prueba",200,"Sin imagen","abc123",25);
-    await productos.addProduct("2p2roducto prueba2","2Este es un producto prueba2",2200,"2Sin imagen","2abc123",25);
-    console.log(await productos.getProducts());
-    console.log(await productos.getProductById(1));
-    console.log(await productos.getProductById(188));
-    await productos.updateProduct(1,"stock","aaaa");
-    console.log(await productos.getProducts());
-    await productos.deleteProduct(1);
-}
-
-test();
+// test();
