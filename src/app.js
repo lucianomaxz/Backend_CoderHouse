@@ -1,43 +1,26 @@
 import express from "express";
-import ProductManager from "./productManager/ProductManager.js";
+import productRouter from './routes/productRouter.js'
+import cartRouter from './routes/cartRouter.js';
+import { dirname } from 'path';
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { fileURLToPath } from "url";
 
-import { products } from '../products.js'
+
 const app = express();
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
+app.use(express.static(__dirname + 'public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+app.use('/api/products', productRouter);
+app.use('/api/carts', cartRouter);
+
+app.use(errorHandler);
 
 const PORT = 8080;
-
-app.get('/products',(req, res) => {
-
-try {
-    try {
-
-        const { limit } = req.query;
-
-        if (limit){
-            const newProducts = products.slice(0, limit);
-            res.status(200).json(newProducts);
-        }else res.status(200).json(products);
-
-    } catch (error) {
-        res.status(500).json({ msg: error.message });
-    }
-} catch (error) {
-    
-}
-
-
-    
-});
-
-//params
-app.get('/products/:id',(req, res) => {
-    const { id } = req.params;
-    const prod = products.find(p => p.id === id);
-    if(!prod) res.json({msg: 'Product not found'})
-    else res.json(prod);    
-});
-
 
 
 app.listen(PORT, ()=>console.log('Server ok on port ' + PORT));

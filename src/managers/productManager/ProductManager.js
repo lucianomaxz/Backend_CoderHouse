@@ -12,20 +12,20 @@ export default class ProductManager {
         this.products = [];
     }
 
-    async addProduct(title,description,price,thumbnail,code,stock) {
+    async addProduct(obj) {
         try {
-            if (!this.isNotDuplicate(code) & !title || !description || !price || !thumbnail || !code || !stock){
+            if ((!this.isNotDuplicate(obj.code)) & (!obj.title || !obj.description || !obj.price || !obj.thumbnail || !obj.code || !obj.stock)){
                 console.log("Please fill all the fields");
             }else{
-                if(this.isNotDuplicate(code)){
+                if(this.isNotDuplicate(obj.code)){
                     const newProduct = {
                         id: uuidv4(),
-                        title: title,
-                        descrption: description,
-                        price: price,
-                        thumbnail: thumbnail,
-                        code: code,
-                        stock: stock,
+                        title: obj.title,
+                        descrption: obj.description,
+                        price: obj.price,
+                        thumbnail: obj.thumbnail,
+                        code: obj.code,
+                        stock: obj.stock,
                     }
                     this.products.push(newProduct);
                     await fs.promises.writeFile(this.path, JSON.stringify(this.products));
@@ -36,7 +36,7 @@ export default class ProductManager {
     
             }
         } catch (e) {
-
+            console.log(e);
         }
         
 
@@ -53,15 +53,10 @@ export default class ProductManager {
         }
     }
 
-
-    // idGenerator(){
-    //     return this.products.length + 1;
-    // }
-
     getProductById = async(productId) =>{
         const products = await this.getProducts();
         const product = products.find(product => product.id === productId);
-        return product || "not found";
+        return product || null;
     }
 
     isNotDuplicate(code){
@@ -75,35 +70,16 @@ export default class ProductManager {
     }
 
 
-    // updateProduct = async(id, nombrePosicion, newValue) => {
-    //     const products = await this.getProducts();
-    //     const index = products.findIndex(p => p.id === id);
-
-            
-    //     const product = products[index];
-    //     product[nombrePosicion] = newValue;
-
-    //     await fs.promises.writeFile(this.path, JSON.stringify(products));
-
-    // }
-
-    updateProduct = async(id, nombrePosicion, newValue) => {
-        const products = await this.getProducts();
-        const index = products.findIndex(product => product.id === id);
-        
-        products[index][nombrePosicion] = newValue;
-
-        await fs.promises.writeFile(this.path, JSON.stringify(products));
-
-    }
-
     async updateProducts (obj,id){
         try {
             const products = await this.getProducts();
-            const product = this.getProductById(id);
-            if(!product) return "Product not found"
+            let product = await this.getProductById(id);
+            if(!product) return null
             product = {...product, ...obj};
-            await fs.promises.writeFile(this.path, JSON.stringify(products));
+            const newProducts = products.filter(p => p.id !== id);
+            newProducts.push(product);
+            await fs.promises.writeFile(this.path, JSON.stringify(newProducts));
+
             return product;
         } catch (error) {
             console.log(error);
@@ -112,12 +88,21 @@ export default class ProductManager {
     }
 
     async deleteProduct(id){
-        const products = await this.getProducts();
-        const product = products.filter(p => p.id !== id);
-        await fs.promises.writeFile(this.path, JSON.stringify(product));
+        try {
+            const products = await this.getProducts();
+            if (products.length > 0) {
+                const product = await this.getProductById(id);
+                if(product){
+                    const newProducts = products.filter(p => p.id !== id);
+                    await fs.promises.writeFile(this.path, JSON.stringify(newProducts));
+                    return product;
+                }
+            }else null;
+            
+        } catch (error) {
+            console.error(error);
+        }
+
     }
 }
 
-//  
-
-// test();
