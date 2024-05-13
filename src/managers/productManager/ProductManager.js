@@ -14,7 +14,7 @@ export default class ProductManager {
 
     async addProduct(obj) {
         try {
-            if ((!this.isNotDuplicate(obj.code)) & (!obj.title || !obj.description || !obj.price || !obj.thumbnail || !obj.code || !obj.stock)){
+            if ((!this.isNotDuplicate(obj.code)) & (!obj.title || !obj.description || !obj.price || !obj.thumbnail || !obj.code || !obj.stock || !obj.category)){
                 console.log("Please fill all the fields");
             }else{
                 if(this.isNotDuplicate(obj.code)){
@@ -26,6 +26,7 @@ export default class ProductManager {
                         thumbnail: obj.thumbnail,
                         code: obj.code,
                         stock: obj.stock,
+                        category: obj.category
                     }
                     this.products.push(newProduct);
                     await fs.promises.writeFile(this.path, JSON.stringify(this.products));
