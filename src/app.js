@@ -10,6 +10,9 @@ import handlebars from "express-handlebars";
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Conectar a la base de datos MongoDB
+// connectDB();
+
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
