@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from 'morgan';
 import productRouter from './routes/productRouter.js'
 import cartRouter from './routes/cartRouter.js';
 import { dirname } from 'path';
@@ -6,16 +7,16 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import { fileURLToPath } from "url";
 import { Server } from 'socket.io'
 import handlebars from "express-handlebars";
+import { initMongoDB } from './db/database.js';
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Conectar a la base de datos MongoDB
-// connectDB();
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 
 app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
@@ -28,12 +29,13 @@ app.get('/realtimeproducts', (req, res)=>{
 
 
 app.use('/api/products', productRouter);
-app.use('/api/carts', cartRouter);
+app.use('/carts', cartRouter);
 
 app.use(errorHandler);
 
-const PORT = 8080;
+initMongoDB();
 
+const PORT = 8080;
 
 const httpServer = app.listen(8080, () => {
     console.log("Escuchando al puerto 8080");
