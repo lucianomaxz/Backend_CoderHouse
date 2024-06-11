@@ -8,6 +8,26 @@ import { fileURLToPath } from "url";
 import { Server } from 'socket.io'
 import handlebars from "express-handlebars";
 import { initMongoDB } from './db/database.js';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import userRouter from './routes/user.router.js';
+import viewsRouter from './routes/views.router.js';
+import MongoStore from 'connect-mongo';
+import 'dotenv/config';
+
+
+const storeConfig = {
+  store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URL,
+      crypto: { secret: process.env.SECRET_KEY },
+      ttl: 180,
+  }),
+  secret: process.env.SECRET_KEY,
+  resave: true,
+  saveUninitialized: true,
+  cookie: { maxAge: 180000 }
+};
+
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,6 +36,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(session(storeConfig));
 app.use(morgan('dev'));
 
 app.engine("handlebars", handlebars.engine());
@@ -34,6 +56,11 @@ app.use('/carts', cartRouter);
 app.use(errorHandler);
 
 initMongoDB();
+
+
+app.use('/users', userRouter);
+app.use('/views', viewsRouter);
+
 
 const PORT = 8080;
 
