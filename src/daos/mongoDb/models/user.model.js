@@ -3,7 +3,7 @@ import {Schema, model} from 'mongoose'
 const userSchema = new Schema({
   first_name: {
       type: String,
-      required: true
+      required: true,
   },
   last_name: {
       type: String,
@@ -11,7 +11,7 @@ const userSchema = new Schema({
   email: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
   },
   age: {
       type: Number,
@@ -21,15 +21,15 @@ const userSchema = new Schema({
   },
   role: {
       type: String,
-      default: 'user'
+      default: 'user',
   },
   image: {
-    type: String
+    type: String,
   },
   isGithub: {
       type: Boolean,
-      default: false
-  }
+      default: false,
+  },
 });
 
 export const UserModel = model('Users',userSchema)

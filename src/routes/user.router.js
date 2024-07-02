@@ -31,6 +31,7 @@ router.post("/register", passport.authenticate('register'), registerResponse);
 router.get('/register-github', passport.authenticate('github', { scope: [ 'user:email' ] }));
 
 router.get('/profile', passport.authenticate('github', { scope: [ 'user:email' ] }), githubResponse)
+router.get('/api/session/', passport.authenticate('github', { scope: [ 'user:email' ] }), githubResponse)
 
 // router.get('/profile', passport.authenticate( 'github' , {
 //     failureRedirect: '/login', 
