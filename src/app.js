@@ -14,6 +14,7 @@ import userRouter from './routes/user.router.js';
 import viewsRouter from './routes/views.router.js';
 import MongoStore from 'connect-mongo';
 import 'dotenv/config';
+import config from './server-config/config.js';
 
 
 const storeConfig = {
@@ -68,10 +69,9 @@ app.use('/views', viewsRouter);
 
 const PORT = 8080;
 
-const httpServer = app.listen(8080, () => {
-    console.log("Escuchando al puerto 8080");
-  });
-
+const httpServer = app.listen(PORT, ()=>{
+  console.log(`🚀 Server listening on port ${PORT} in ${config.NODE_ENV} mode`);
+});
   const socketServer = new Server(httpServer);
 
 
