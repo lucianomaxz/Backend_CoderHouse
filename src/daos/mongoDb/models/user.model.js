@@ -1,35 +1,47 @@
-import {Schema, model} from 'mongoose'
+import { Schema, model } from "mongoose";
 
-const userSchema = new Schema({
+const usersSchema = new Schema({
   first_name: {
-      type: String,
-      required: true,
+    type: String,
+    required: true,
   },
   last_name: {
-      type: String,
+    type: String,
+    required: true,
   },
   email: {
-      type: String,
-      required: true,
-      unique: true,
+    type: String,
+    required: true,
+    unique: true,
   },
   age: {
-      type: Number,
+    type: Number,
+    required: true,
+    default: 0,
   },
-  password: { 
-      type: String,
+  password: {
+    type: String,
+    required: true,
   },
   role: {
-      type: String,
-      default: 'user',
-  },
-  image: {
     type: String,
+    default: "user",
   },
   isGithub: {
-      type: Boolean,
-      default: false,
+    type: Boolean,
+    required: true,
+    default: false,
   },
+  isGoogle: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  cart: {
+    type: Schema.Types.ObjectId,
+    ref: "carts",
+    default: []
+  }
 });
-
-export const UserModel = model('Users',userSchema)
+const userColl = "users";
+export const UserModel = model(userColl, usersSchema);
