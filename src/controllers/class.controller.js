@@ -1,4 +1,6 @@
-import { createResponse } from '../utils.js';
+import errorsDictionary from "../utils/errors.dictionary.js";
+import { HttpResponse } from "../utils/http.response.js";
+const httpResponse = new HttpResponse();
 
 export default class Controllers {
   constructor(service) {
@@ -8,9 +10,10 @@ export default class Controllers {
   getAll = async(req, res, next) =>{
     try {
       const data = await this.service.getAll();
-      createResponse(res, 200, data);
+      return httpResponse.Ok(res, data);
     } catch (error) {
-      next(error);
+      console.log('PASA EL ERROR POR EL CONTROLLER');
+      next(error);  //--> errorHandler
     }
   };
 
@@ -18,8 +21,9 @@ export default class Controllers {
     try {
       const { id } = req.params;
       const data = await this.service.getById(id);
-      if(!data) createResponse(res, 404, data)
-      else createResponse(res, 200, data);
+      // if(!data) return httpResponse.NotFound(res, errorsDictionary.NOT_FOUND);
+      if(!data) return httpResponse.NotFound(res, data)
+      else return httpResponse.Ok(res, data);
     } catch (error) {
       next(error);
     }
@@ -28,7 +32,7 @@ export default class Controllers {
   create = async(req, res, next) => {
     try {
       const data = await this.service.create(req.body);
-      createResponse(res, 200, data);
+      return httpResponse.Ok(res, data);
     } catch (error) {
       next(error);
     }
@@ -38,8 +42,8 @@ export default class Controllers {
     try {
       const { id } = req.params;
       const data = await this.service.update(id, req.body);
-      if(!data) createResponse(res, 404, data)
-        else createResponse(res, 200, data);
+      if(!data) return httpResponse.NotFound(res, data);
+        else return httpResponse.Ok(res, data);
     } catch (error) {
       next(error);
     }
@@ -49,8 +53,8 @@ export default class Controllers {
     try {
       const { id } = req.params;
       const data = await this.service.delete(id);
-      if(!data) createResponse(res, 404, data)
-        else createResponse(res, 200, data);
+      if(!data) return httpResponse.NotFound(res, data);
+        else return httpResponse.Ok(res, data);
     } catch (error) {
       next(error);
     }
