@@ -15,7 +15,7 @@ import viewsRouter from './routes/views.router.js';
 import MongoStore from 'connect-mongo';
 import 'dotenv/config';
 import config from './server-config/config.js';
-
+import { logger } from './utils/logger.js';
 
 const storeConfig = {
   store: MongoStore.create({
@@ -46,6 +46,18 @@ app.set("view engine", "handlebars");
 app.set("views", __dirname + "/views");
 
 
+
+app.get('/loggerTest', (req, res) => {
+  logger.debug('Este es un mensaje de debug');
+  logger.info('Este es un mensaje de info');
+  logger.warn('Este es un mensaje de warning');
+  logger.error('Este es un mensaje de error');
+  logger.fatal('Este es un mensaje fatal');
+  
+  res.send('Logs enviados a la consola y archivos según el entorno.');
+});
+
+
 // app.use(passport.initialize());
 // app.use(passport.session());
 
@@ -70,7 +82,7 @@ app.use('/views', viewsRouter);
 const PORT = 8080;
 
 const httpServer = app.listen(PORT, ()=>{
-  console.log(`🚀 Server listening on port ${PORT} in ${config.NODE_ENV} mode`);
+  logger.debug(`🚀 Server listening on port ${PORT} in ${config.NODE_ENV} mode`);
 });
   const socketServer = new Server(httpServer);
 
@@ -78,16 +90,16 @@ const httpServer = app.listen(PORT, ()=>{
   const products = [];
 
 socketServer.on('connection', (socket)=>{
-  console.log(`Usuario conectado: ${socket.id}`);
+  logger.info(`Usuario conectado: ${socket.id}`);
 
   socket.on('disconnect', ()=>{
-    console.log('Usuario desconectado');
+    logger.info('Usuario desconectado');
   })
 
   socket.emit('saludoDesdeBack', 'Bienvenido a websockets')
 
   socket.on('respuestaDesdeFront', (message)=>{
-    console.log(message);
+    logger.info(message);
   })
 
   socket.on('newProduct', (prod)=>{
