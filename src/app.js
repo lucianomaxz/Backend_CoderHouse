@@ -33,6 +33,9 @@ const storeConfig = {
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const PERSISTENCE = config.PERSISTENCE;
+
+if(PERSISTENCE === 'MONGO') initMongoDB();
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
