@@ -16,6 +16,10 @@ import MongoStore from 'connect-mongo';
 import 'dotenv/config';
 import config from './server-config/config.js';
 import { logger } from './utils/logger.js';
+import swaggerUI from 'swagger-ui-express';
+import swaggerJSDoc from 'swagger-jsdoc';
+
+import { info } from './docs/info.js';
 
 const storeConfig = {
   store: MongoStore.create({
@@ -32,6 +36,10 @@ const storeConfig = {
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const specs = swaggerJSDoc(info);
+
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 const PERSISTENCE = config.PERSISTENCE;
 
