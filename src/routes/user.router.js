@@ -12,6 +12,8 @@ import { validateLogin } from "../middlewares/validateLogin.js";
 import passport from "passport";
 import { isAuth } from "../middlewares/isAuth.js";
 import { checkAuth } from "../middlewares/jwt.js";
+import { checkAdmin } from "../middlewares/checkAdmin.js";
+
 import UserController from '../controllers/user.controller.js';
 const controller = new UserController();
 
@@ -57,7 +59,7 @@ router.get('/logout', (req, res) => {
 
 router.get('/private', checkAuth, (req, res)=>res.json({ user: req.user }));
 
-
+router.get('/', checkAdmin, controller.checkUsersLastConnection);
 
 // router.get("/secret-endpoint", validateLogin, visit);
 // router.post("/logout", logout);

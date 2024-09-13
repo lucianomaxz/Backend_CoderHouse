@@ -61,7 +61,10 @@ export default class UserService extends Services {
       if (!userExist) return null;
       const passValid = isValidPassword(password, userExist);
       if (!passValid) return null;
-      if (userExist && passValid) return this.generateToken(userExist);
+      if (userExist && passValid){
+        await this.updateLastConnection(userExist._id);
+        return this.generateToken(userExist);
+      } 
     } catch (error) {
       throw new Error(error);
     }
@@ -99,4 +102,37 @@ export default class UserService extends Services {
       throw new Error(error)
     }
   }
+
+  async updateLastConnection(userId) {
+    return await this.dao.update(userId, {
+      last_connection: new Date(),
+    });
+  }
+
+  async checkUsersLastConnection(){
+    try {
+      const usersInactive = [];
+      const users = await this.dao.getAll();
+      if(users.length > 0){
+        for (const user of users) {
+          if(
+            user.last_connection &&
+            hasBeenMoreThanXTime(user.last_connection)
+          ){
+            console.log(`Han pasado mas de 48hs de la ultima conexion de ${user._id}`);
+            await this.dao.update(user._id, {
+              active: false
+            });
+            //ENVIO DE MAIL
+            //..................
+            usersInactive.push(user.email);
+          }
+        }
+      }
+      return usersInactive;
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
 }
