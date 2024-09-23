@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const connectionString = 'mongodb://127.0.0.1:27017/Practica_Integradora_1';
+const connectionString = process.env.MONGO_URL;
 
 export const initMongoDB = async() => {
   try {
